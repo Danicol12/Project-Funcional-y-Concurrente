@@ -22,6 +22,7 @@ def reconstruirCadenaIngenuo(n: Int, o: Oraculo): Seq[Char] = {
 }
 
 
+
   def reconstruirCadenaMejorado(n: Int, o: Oraculo): Seq[Char] = {
     // Recibe la longitud de la secuencia que hay que reconstruir (n), y un oraculo para esa secuencia
     // y devuelve la secuencia reconstruida
