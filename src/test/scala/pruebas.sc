@@ -166,7 +166,7 @@ sec256.length
 sec512.length
 sec1024.length
 //val secprueba=contruirCadenaAleatoria(2048)
-val orac = crearOraculo(1)(sec1024)
+val orac = crearOraculo(1)(sec256)
 /*
 //val pruebaTurbo= reconstruirCadenaTurbo(128, orac)
 val pruebaTurboMejorada= reconstruirCadenaTurboMejorada(128, orac)
@@ -176,8 +176,11 @@ pruebaTurboMejorada==pruebaTurboAcelerada
 pruebaTurboAcelerada==secprueba
 */
 
-val pruebaAce= reconstruirCadenaTurboAcelerada(1024,orac)
-measure(reconstruirCadenaTurboAcelerada(1024,orac))
-pruebaAce==sec1024
+val pruebaAce= reconstruirCadenaTurboAcelerada(256,orac)
+val pruebaMejorado=reconstruirCadenaMejorado(256,orac)
+measure(reconstruirCadenaTurboAcelerada(256,orac))
+pruebaAce==sec256
+
+pruebaMejorado==sec256
 
 
