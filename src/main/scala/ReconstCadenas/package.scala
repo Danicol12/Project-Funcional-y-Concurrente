@@ -3,7 +3,7 @@ import Oraculo._
 
 package object ReconstCadenas {
 /*
-Definimos el alfabeto sobre el que trabaja el genoma
+// Definimos el alfabeto sobre el que trabaja el genoma
 val alfabeto: Seq[Char] = Seq('a', 'c', 'g', 't')
 
 // Tipo para representar el oráculo
@@ -22,6 +22,7 @@ def generarCadenas(n: Int): Seq[Seq[Char]] = {
 def reconstruirCadenaIngenuo(n: Int, o: Oraculo): Seq[Char] = {
   generarCadenas(n).find(o).getOrElse(Seq.empty)
 }
+
 
   def reconstruirCadenaMejorado(n: Int, o: Oraculo): Seq[Char] = {
     // Recibe la longitud de la secuencia que hay que reconstruir (n), y un oraculo para esa secuencia
