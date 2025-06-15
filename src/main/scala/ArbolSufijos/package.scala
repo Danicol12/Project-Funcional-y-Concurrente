@@ -1,3 +1,4 @@
+
 package object ArbolSufijos {
 
   // Definiendo otra estructura para manipular Seq[Seq[Char]]
