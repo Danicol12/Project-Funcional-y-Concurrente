@@ -162,6 +162,7 @@ val sec1024 = Seq(
   'g','t','c','g','t','a','c','a','g','t','g','a','c','a','c','g',
   'a','g','t','t','g','t','a','a','t','c','c','a','a','t','c','c'
 )
+
 sec256.length
 sec512.length
 sec1024.length
