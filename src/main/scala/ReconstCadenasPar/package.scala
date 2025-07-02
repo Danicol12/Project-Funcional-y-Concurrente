@@ -47,14 +47,19 @@ package object ReconstCadenasPar {
 
     def particiones(caracteres: Seq[Char], conjInicial: Seq[Seq[Char]], arbol: Trie): Boolean = {
       val tam = conjInicial.head.length
-      val part = caracteres.sliding(tam).toList
-      part.forall(w => pertenece(w, arbol))
+      caracteres.length >= tam && caracteres.sliding(tam).forall(w => pertenece(w, arbol))
     }
 
     def filtrar(cadenas: Seq[Seq[Char]]): Seq[Seq[Char]] = {
       val arbol = arbolDeSufijos(cadenas)
 
-      if (n <= umbral) {
+      def esValida(s: Seq[Char], k: Int): Boolean =
+        s.length >= k && s.sliding(k).forall(cadenas.contains)
+
+      val k = cadenas.head.length
+
+      // Evita paralelismo si las secuencias son muy cortas o hay pocos datos
+      if (n <= umbral || cadenas.size < 4 || cadenas.exists(_.length < k)) {
         for {
           c1 <- cadenas
           c2 <- cadenas
@@ -96,10 +101,10 @@ package object ReconstCadenasPar {
       }
     }
 
-    def recursivaTurboAceleradaPar(alfa: Seq[Seq[Char]]): Seq[Char] = {
+    def recursivaTurboAcelerada(alfa: Seq[Seq[Char]]): Seq[Char] = {
       val combinacionesSec = filtrar(alfa)
 
-      val filtrado = if (n <= umbral) {
+      val filtrado = if (n <= umbral || combinacionesSec.size < 4) {
         combinacionesSec.filter(x => o(x))
       } else {
         val (left, right) = combinacionesSec.par.splitAt(combinacionesSec.size / 2)
@@ -113,7 +118,7 @@ package object ReconstCadenasPar {
         (fl1 ++ fl2 ++ fr1 ++ fr2).seq
       }
 
-      filtrado.find(_.length == n).getOrElse(recursivaTurboAceleradaPar(filtrado))
+      filtrado.find(_.length == n).getOrElse(recursivaTurboAcelerada(filtrado))
     }
 
     val conjuntoInicial = alfabeto.map(Seq(_))
@@ -129,6 +134,6 @@ package object ReconstCadenasPar {
       } yield s
       combinaciones.headOption.getOrElse(Seq.empty)
     } else {
-      recursivaTurboAceleradaPar(conjuntoInicial)
+      recursivaTurboAcelerada(conjuntoInicial)
     }
   }
