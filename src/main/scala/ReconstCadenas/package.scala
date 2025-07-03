@@ -3,14 +3,20 @@ import Oraculo._
 import scala.util.Random
 
 package object ReconstCadenas {
-/*
+
+
   def reconstruirCadenaIngenuo(n: Int, o: Oraculo): Seq[Char] = {
-    // Recibe la longitud de la secuencia que hay que reconstruir (n), y un oraculo para esa secuencia
-    // y devuelve la secuencia reconstruida
-    ???
+
+    def generarCadenas(k: Int): Seq[Seq[Char]] = {
+      if (k == 0) Seq(Seq.empty)
+      else for {
+        prefijo <- generarCadenas(k - 1)
+        letra <- alfabeto
+      } yield prefijo :+ letra
+    }
+
+    generarCadenas(n).find(o).getOrElse(Seq.empty)
   }
-  
- */
 
   def reconstruirCadenaMejorado(n: Int, o: Oraculo): Seq[Char] = {
 

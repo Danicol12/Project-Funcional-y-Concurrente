@@ -1,4 +1,5 @@
 import ReconstCadenas.*
+import ReconstCadenasPar.*
 import Oraculo.*
 import ArbolSufijos.*
 import benchmark.*
@@ -166,8 +167,10 @@ val sec1024 = Seq(
 sec256.length
 sec512.length
 sec1024.length
-//val secprueba=contruirCadenaAleatoria(2048)
-val orac = crearOraculo(1)(sec256)
+sec16.length
+
+val cadenaAleatoria=contruirCadenaAleatoria(7)
+val orac = crearOraculo(1)(cadenaAleatoria)
 /*
 //val pruebaTurbo= reconstruirCadenaTurbo(128, orac)
 val pruebaTurboMejorada= reconstruirCadenaTurboMejorada(128, orac)
@@ -177,11 +180,6 @@ pruebaTurboMejorada==pruebaTurboAcelerada
 pruebaTurboAcelerada==secprueba
 */
 
-val pruebaAce= reconstruirCadenaTurboAcelerada(256,orac)
-val pruebaMejorado=reconstruirCadenaMejorado(256,orac)
-measure(reconstruirCadenaTurboAcelerada(256,orac))
-pruebaAce==sec256
+promedioComparacion(reconstruirCadenaIngenuo, reconstruirCadenaIngenuoPar(5))(7,5,orac)
 
-pruebaMejorado==sec256
-
-
+//compararAlgoritmos(reconstruirCadenaTurboAcelerada,reconstruirCadenaTurboAceleradaPar(8))(256,orac)

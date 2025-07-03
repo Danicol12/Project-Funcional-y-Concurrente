@@ -26,6 +26,20 @@ package object benchmark {
     (timeA1.value, timeA2.value, speedUp)
   }
 
+  def promedioComparacion(a1: Algoritmo, a2: Algoritmo)(tamaño:Int, repe: Int, oraculo: Oraculo
+                         ): ((Double, Double, Double), Vector[(Double, Double, Double)]) = {
+
+    val resultados: Vector[(Double, Double, Double)] = (1 to repe).map { _ =>
+      compararAlgoritmos(a1, a2)(tamaño, oraculo)
+    }.toVector
+
+    val promedioTiempo1 = resultados.map(_._1).sum / repe
+    val promedioTiempo2 = resultados.map(_._2).sum / repe
+    val promedioSpeedup = resultados.map(_._3).sum / repe
+
+    ((promedioTiempo1, promedioTiempo2, promedioSpeedup), resultados)
+  }
+
 
 
 }
