@@ -3,30 +3,37 @@ import Oraculo._
 import scala.util.Random
 
 package object ReconstCadenas {
-  /*
-    def reconstruirCadenaIngenuo(n: Int, o: Oraculo): Seq[Char] = {
-      // Recibe la longitud de la secuencia que hay que reconstruir (n), y un oraculo para esa secuencia
-      // y devuelve la secuencia reconstruida
-      ???
+
+
+  def reconstruirCadenaIngenuo(n: Int, o: Oraculo): Seq[Char] = {
+
+    def generarCadenas(k: Int): Seq[Seq[Char]] = {
+      if (k == 0) Seq(Seq.empty)
+      else for {
+        prefijo <- generarCadenas(k - 1)
+        letra <- alfabeto
+      } yield prefijo :+ letra
     }
-*/
-  // Función principal: intenta reconstruir una cadena de longitud n utilizando un oráculo
+
+    generarCadenas(n).find(o).getOrElse(Seq.empty)
+  }
+
   def reconstruirCadenaMejorado(n: Int, o: Oraculo): Seq[Char] = {
 
     /**
      * Función recursiva auxiliar que construye posibles cadenas válidas de forma incremental.
      *
-     * @param paso         número de caracteres que estamos intentando generar en esta iteración
-     * @param acumuladas   conjunto de secuencias válidas encontradas hasta el momento
-     * @return             una cadena válida de longitud n si se encuentra, o secuencia vacía si no
+     * @param paso       número de caracteres que estamos intentando generar en esta iteración
+     * @param acumuladas conjunto de secuencias válidas encontradas hasta el momento
+     * @return una cadena válida de longitud n si se encuentra, o secuencia vacía si no
      */
     def construirCadena(paso: Int, acumuladas: Seq[Seq[Char]]): Seq[Char] = {
 
       // Para cada secuencia acumulada, intenta agregar cada letra del alfabeto al final
       // y se queda con aquellas nuevas secuencias que el oráculo acepta como válidas
       val nuevas = acumuladas.flatMap { parcial =>
-        alfabeto.map(letra => parcial :+ letra)  // concatena una letra al final de la secuencia
-      }.filter(seq => o(seq))  // filtra solo las que el oráculo dice que son válidas
+        alfabeto.map(letra => parcial :+ letra) // concatena una letra al final de la secuencia
+      }.filter(seq => o(seq)) // filtra solo las que el oráculo dice que son válidas
 
       // Busca entre las nuevas secuencias alguna que ya tenga longitud n (es decir, la completa)
       val coincidencias = nuevas.filter(_.length == n)
@@ -47,7 +54,9 @@ package object ReconstCadenas {
     construirCadena(1, Seq(Seq.empty))
   }
 
-}
+
+
+ 
 
   def reconstruirCadenaTurbo(n: Int, o: Oraculo): Seq[Char] = {
 
@@ -79,9 +88,9 @@ package object ReconstCadenas {
       } yield c1 ++ c2
       val filtrado=combinacionesSec.filter(x=> o(x))
       if (filtrado.head.length==n) filtrado.head
-      else{
-        funcionrecursivaTurbo(filtrado)
-      }
+        else{
+          funcionrecursivaTurbo(filtrado)
+        }
     }
     if(n==1){
       filtrado
@@ -90,8 +99,8 @@ package object ReconstCadenas {
       filtrado2.head
     }
 
-    else{
-      funcionrecursivaTurbo(filtrado2)}
+      else{
+        funcionrecursivaTurbo(filtrado2)}
   }
 
 
@@ -134,9 +143,9 @@ package object ReconstCadenas {
       val combinacionesSec = filtrar(alfa)
       val filtrado=combinacionesSec.filter(x=> o(x))
       if (filtrado.head.length==n) filtrado.head
-      else{
-        recursivaTurboMejorada(filtrado)
-      }
+        else{
+          recursivaTurboMejorada(filtrado)
+        }
     }
     if(n==1){
       filtrado
@@ -152,8 +161,8 @@ package object ReconstCadenas {
       filtrado2.head
     }
 
-    else{
-      recursivaTurboMejorada(combinaciones)}
+      else{
+        recursivaTurboMejorada(combinaciones)}
   }
 
   def reconstruirCadenaTurboAcelerada(n: Int, o: Oraculo): Seq[Char] = {
@@ -221,8 +230,8 @@ package object ReconstCadenas {
       recursivaTurboAcelerada(combinaciones)
     }
   }
-
-
+  
+  
   def contruirCadenaAleatoria(tam:Int):Seq[Char]={
     for{
       i<- 1 to tam

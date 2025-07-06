@@ -6,13 +6,30 @@ import ArbolSufijos._
 package object ReconstCadenasPar {
 
   // Ahora versiones paralelas
-  /*
+
   def reconstruirCadenaIngenuoPar(umbral: Int)(n: Int, o: Oraculo): Seq[Char] = {
-    // Recibe la longitud de la secuencia que hay que reconstruir (n), y un oraculo para esa secuencia
-    // y devuelve la secuencia reconstruida
-    // Usa paralelismo de tareas
-    ???
+
+    def generarCadenas(k: Int): Seq[Seq[Char]] = {
+      if (k == 0) Seq(Seq.empty)
+      else if (k >= umbral) {
+        // Paralelizamos por letra
+        val part1 = task(generarCadenas(k - 1).map(_ :+ 'a'))
+        val part2 = task(generarCadenas(k - 1).map(_ :+ 'c'))
+        val part3 = task(generarCadenas(k - 1).map(_ :+ 'g'))
+        val part4 = task(generarCadenas(k - 1).map(_ :+ 't'))
+
+        part1.join() ++ part2.join() ++ part3.join() ++ part4.join()
+      } else {
+        for {
+          prefijo <- generarCadenas(k - 1)
+          letra <- alfabeto
+        } yield prefijo :+ letra
+      }
+    }
+
+    generarCadenas(n).par.find(o).getOrElse(Seq.empty)
   }
+  /*
 
   def reconstruirCadenaMejoradoPar(umbral: Int)(n: Int, o: Oraculo): Seq[Char] = {
     // Recibe la longitud de la secuencia que hay que reconstruir (n), y un oraculo para esa secuencia
@@ -23,12 +40,15 @@ package object ReconstCadenasPar {
   }
 
   def reconstruirCadenaTurboPar(umbral: Int)(n: Int, o: Oraculo): Seq[Char] = {
+
+
     // Recibe la longitud de la secuencia que hay que reconstruir (n, potencia de 2), y un oraculo para esa secuencia
     // y devuelve la secuencia reconstruida
     // Usa la propiedad de que si s = s1 ++ s2 entonces s1 y s2 también son subsecuencias de s
     // Usa paralelismo de tareas y/o datos
     ???
   }
+
 
   def reconstruirCadenaTurboMejoradaPar(umbral: Int)(n: Int, o: Oraculo): Seq[Char] = {
     // Recibe la longitud de la secuencia que hay que reconstruir (n, potencia de 2), y un oraculo para esa secuencia
@@ -37,8 +57,8 @@ package object ReconstCadenasPar {
     // Usa paralelismo de tareas y/o datos
     ???
   }
-
- */
+  
+   */
 
   def reconstruirCadenaTurboAceleradaPar(umbral:Int)(n: Int, o: Oraculo): Seq[Char] = {
     // Usa la propiedad de que si s = s1 ++ s2 entonces s1 y s2 también son subsecuencias de s
