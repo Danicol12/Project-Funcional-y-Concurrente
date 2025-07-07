@@ -169,9 +169,28 @@ sec512.length
 sec1024.length
 sec16.length
 
-val cadenaAleatoria=contruirCadenaAleatoria(16)
+val cadenaAleatoria=contruirCadenaAleatoria(64)
 val orac = crearOraculo(1)(cadenaAleatoria)
+
+val pruebaTurboAcelerada= reconstruirCadenaTurboAcelerada(64, orac)
+val pruebaTurboAceleradaPar= reconstruirCadenaTurboAceleradaPar(64)(64, orac)
+pruebaTurboAcelerada==pruebaTurboAceleradaPar
+
+val ((tiempo1, tiempo2, speedup), resultados) = promedioComparacion(reconstruirCadenaTurboAcelerada, reconstruirCadenaTurboAceleradaPar(2))(16, 1, orac)
+
+println(f"Tiempo promedio Secuencial: $tiempo1%.4f s")
+println(f"Tiempo promedio Paralelo: $tiempo2%.4f s")
+println(f"Speedup promedio: $speedup%.2f")
+
+resultados.zipWithIndex.foreach { case ((t1, t2, sp), idx) =>
+  println(f"Repetición ${idx + 1}: Sec = $t1%.4f s, Par = $t2%.4f s, Speedup = $sp%.2f")
+}
+
+//compararAlgoritmos(reconstruirCadenaTurboAcelerada,reconstruirCadenaTurboAceleradaPar(8))(256,orac)
 /*
+
+promedioComparacion(reconstruirCadenaTurboAcelerada, reconstruirCadenaTurboAceleradaPar(2))(16,1,orac)
+
 //val pruebaTurbo= reconstruirCadenaTurbo(128, orac)
 val pruebaTurboMejorada= reconstruirCadenaTurboMejorada(128, orac)
 val pruebaTurboAcelerada= reconstruirCadenaTurboAcelerada(128,orac)
@@ -179,10 +198,3 @@ val pruebaTurboAcelerada= reconstruirCadenaTurboAcelerada(128,orac)
 pruebaTurboMejorada==pruebaTurboAcelerada
 pruebaTurboAcelerada==secprueba
 */
-val pruebaTurboAcelerada= reconstruirCadenaTurboAcelerada(16, orac)
-val pruebaTurboAceleradaPar= reconstruirCadenaTurboAceleradaPar(2)(16, orac)
-pruebaTurboAcelerada==pruebaTurboAceleradaPar
-
-//promedioComparacion(reconstruirCadenaTurboAcelerada, reconstruirCadenaTurboAceleradaPar(16))(16,1,orac)
-
-//compararAlgoritmos(reconstruirCadenaTurboAcelerada,reconstruirCadenaTurboAceleradaPar(8))(256,orac)
