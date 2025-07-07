@@ -72,7 +72,7 @@ package object ReconstCadenasPar {
     def filtrar(cadenas: Seq[Seq[Char]]): Seq[Seq[Char]] = {
       if (cadenas.isEmpty) return Seq.empty
 
-      // 👈 Forzar a List aquí
+      // Forzar a List aquí
       val arbol = arbolDeSufijos(cadenas.toList)
 
       val longitudActual = cadenas.headOption.map(_.length).getOrElse(0)
@@ -88,8 +88,8 @@ package object ReconstCadenasPar {
         val cadenasPar = cadenas.par
         val (left, right) = cadenasPar.splitAt(cadenasPar.size / 2)
         val ((l1, l2), (r1, r2)) = (
-          left.toList.splitAt(left.size / 2), // 👈 Forzar a List
-          right.toList.splitAt(right.size / 2) // 👈 Forzar a List
+          left.toList.splitAt(left.size / 2), //  Forzar a List
+          right.toList.splitAt(right.size / 2) // Forzar a List
         )
 
         val (res1, res2, res3, res4) = parallel(
@@ -135,8 +135,8 @@ package object ReconstCadenasPar {
       } else {
         val (left, right) = combinacionesSec.par.splitAt(combinacionesSec.size / 2)
         val ((l1, l2), (r1, r2)) = (
-          left.toList.splitAt(left.size / 2), // 👈 Forzar a List
-          right.toList.splitAt(right.size / 2) // 👈 Forzar a List
+          left.toList.splitAt(left.size / 2), // Forzar a List
+          right.toList.splitAt(right.size / 2) // Forzar a List
         )
         val (fl1, fl2, fr1, fr2) = parallel(
           l1.filter(o),
@@ -151,7 +151,7 @@ package object ReconstCadenasPar {
       else filtrado.find(_.length == n).getOrElse(recursivaTurboAceleradaPar(filtrado))
     }
 
-    val conjuntoInicial = alfabeto.map(Seq(_)).toList // 👈 Forzar a List también aquí
+    val conjuntoInicial = alfabeto.map(Seq(_)).toList // Forzar a List también aquí
 
     if (n == 1) {
       conjuntoInicial.find(c => o(c)).getOrElse(Seq.empty)
