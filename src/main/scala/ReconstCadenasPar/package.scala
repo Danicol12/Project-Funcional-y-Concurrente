@@ -60,21 +60,24 @@ package object ReconstCadenasPar {
   
    */
 
-  def reconstruirCadenaTurboAceleradaPar(umbral:Int)(n: Int, o: Oraculo): Seq[Char] = {
-    // Usa la propiedad de que si s = s1 ++ s2 entonces s1 y s2 también son subsecuencias de s
-    // Usa árboles de sufijos para guardar Seq[Seq[Char]]
-    // Paraleliza según umbral
+  def reconstruirCadenaTurboAceleradaPar(umbral: Int)(n: Int, o: Oraculo): Seq[Char] = {
 
     def particiones(caracteres: Seq[Char], conjInicial: Seq[Seq[Char]], arbol: Trie): Boolean = {
+      if (conjInicial.isEmpty) return false
       val tam = conjInicial.head.length
       val part = caracteres.sliding(tam).toList
       part.forall(w => pertenece(w, arbol))
     }
 
     def filtrar(cadenas: Seq[Seq[Char]]): Seq[Seq[Char]] = {
-      val arbol = arbolDeSufijos(cadenas)
+      if (cadenas.isEmpty) return Seq.empty
 
-      if (n <= umbral) {
+      // 👈 Forzar a List aquí
+      val arbol = arbolDeSufijos(cadenas.toList)
+
+      val longitudActual = cadenas.headOption.map(_.length).getOrElse(0)
+
+      if (longitudActual >= umbral) {
         for {
           c1 <- cadenas
           c2 <- cadenas
@@ -84,7 +87,10 @@ package object ReconstCadenasPar {
       } else {
         val cadenasPar = cadenas.par
         val (left, right) = cadenasPar.splitAt(cadenasPar.size / 2)
-        val ((l1, l2), (r1, r2)) = (left.splitAt(left.size / 2), right.splitAt(right.size / 2))
+        val ((l1, l2), (r1, r2)) = (
+          left.toList.splitAt(left.size / 2), // 👈 Forzar a List
+          right.toList.splitAt(right.size / 2) // 👈 Forzar a List
+        )
 
         val (res1, res2, res3, res4) = parallel(
           for {
@@ -112,6 +118,7 @@ package object ReconstCadenasPar {
             if particiones(s, cadenas, arbol)
           } yield s
         )
+
         (res1 ++ res2 ++ res3 ++ res4).seq
       }
     }
@@ -119,11 +126,18 @@ package object ReconstCadenasPar {
     def recursivaTurboAceleradaPar(alfa: Seq[Seq[Char]]): Seq[Char] = {
       val combinacionesSec = filtrar(alfa)
 
-      val filtrado = if (n <= umbral) {
+      if (combinacionesSec.isEmpty) return Seq.empty
+
+      val longitudActual = combinacionesSec.headOption.map(_.length).getOrElse(0)
+
+      val filtrado = if (longitudActual >= umbral) {
         combinacionesSec.filter(x => o(x))
       } else {
         val (left, right) = combinacionesSec.par.splitAt(combinacionesSec.size / 2)
-        val ((l1, l2), (r1, r2)) = (left.splitAt(left.size / 2), right.splitAt(right.size / 2))
+        val ((l1, l2), (r1, r2)) = (
+          left.toList.splitAt(left.size / 2), // 👈 Forzar a List
+          right.toList.splitAt(right.size / 2) // 👈 Forzar a List
+        )
         val (fl1, fl2, fr1, fr2) = parallel(
           l1.filter(o),
           l2.filter(o),
@@ -133,10 +147,11 @@ package object ReconstCadenasPar {
         (fl1 ++ fl2 ++ fr1 ++ fr2).seq
       }
 
-      filtrado.find(_.length == n).getOrElse(recursivaTurboAceleradaPar(filtrado))
+      if (filtrado.isEmpty) Seq.empty
+      else filtrado.find(_.length == n).getOrElse(recursivaTurboAceleradaPar(filtrado))
     }
 
-    val conjuntoInicial = alfabeto.map(Seq(_))
+    val conjuntoInicial = alfabeto.map(Seq(_)).toList // 👈 Forzar a List también aquí
 
     if (n == 1) {
       conjuntoInicial.find(c => o(c)).getOrElse(Seq.empty)
@@ -152,4 +167,7 @@ package object ReconstCadenasPar {
       recursivaTurboAceleradaPar(conjuntoInicial)
     }
   }
+
 }
+
+

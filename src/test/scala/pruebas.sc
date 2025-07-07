@@ -169,7 +169,7 @@ sec512.length
 sec1024.length
 sec16.length
 
-val cadenaAleatoria=contruirCadenaAleatoria(7)
+val cadenaAleatoria=contruirCadenaAleatoria(16)
 val orac = crearOraculo(1)(cadenaAleatoria)
 /*
 //val pruebaTurbo= reconstruirCadenaTurbo(128, orac)
@@ -179,7 +179,10 @@ val pruebaTurboAcelerada= reconstruirCadenaTurboAcelerada(128,orac)
 pruebaTurboMejorada==pruebaTurboAcelerada
 pruebaTurboAcelerada==secprueba
 */
+val pruebaTurboAcelerada= reconstruirCadenaTurboAcelerada(16, orac)
+val pruebaTurboAceleradaPar= reconstruirCadenaTurboAceleradaPar(2)(16, orac)
+pruebaTurboAcelerada==pruebaTurboAceleradaPar
 
-promedioComparacion(reconstruirCadenaIngenuo, reconstruirCadenaIngenuoPar(5))(7,5,orac)
+//promedioComparacion(reconstruirCadenaTurboAcelerada, reconstruirCadenaTurboAceleradaPar(16))(16,1,orac)
 
 //compararAlgoritmos(reconstruirCadenaTurboAcelerada,reconstruirCadenaTurboAceleradaPar(8))(256,orac)
