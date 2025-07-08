@@ -29,15 +29,34 @@ package object ReconstCadenasPar {
 
     generarCadenas(n).par.find(o).getOrElse(Seq.empty)
   }
-  /*
-
+  
   def reconstruirCadenaMejoradoPar(umbral: Int)(n: Int, o: Oraculo): Seq[Char] = {
-    // Recibe la longitud de la secuencia que hay que reconstruir (n), y un oraculo para esa secuencia
-    // y devuelve la secuencia reconstruida
-    // Usa la propiedad de que si s = s1 ++ s2 entonces s1 y s2 también son subsecuencias de s
-    // Usa paralelismo de tareas y/o datos
-    ???
+
+  def construirCadena(paso: Int, acumuladas: Seq[Seq[Char]]): Seq[Char] = {
+
+    val expandidas = acumuladas.flatMap(parcial => alfabeto.map(letra => parcial :+ letra))
+
+    val nuevas = 
+      if (expandidas.size <= umbral) 
+        expandidas.filter(o)
+      else {
+        val (l1, l2) = expandidas.splitAt(expandidas.size / 2)
+        val (fl1, fl2) = parallel(
+          l1.filter(o),
+          l2.filter(o)
+        )
+        (fl1 ++ fl2).seq
+      }
+
+    nuevas.find(_.length == n).getOrElse {
+      if (paso > n) Seq.empty
+      else construirCadena(paso + 1, nuevas)
+    }
   }
+
+  construirCadena(1, Seq(Seq.empty))
+}
+
 
   def reconstruirCadenaTurboPar(umbral: Int)(n: Int, o: Oraculo): Seq[Char] = {
 
