@@ -60,8 +60,13 @@ package object ReconstCadenasPar {
   
    */
 
+  // Función principal paralelizada que reconstruye una cadena secreta
+  // umbral: controla cuándo usar paralelismo o seguir secuencial
+  // n: longitud objetivo de la cadena
+  // o: oráculo que valida si una cadena es válida
   def reconstruirCadenaTurboAceleradaPar(umbral: Int)(n: Int, o: Oraculo): Seq[Char] = {
 
+    // Verifica si todas las subsecuencias de una cadena pertenecen al conjunto válido (usando árbol de sufijos)
     def particiones(caracteres: Seq[Char], conjInicial: Seq[Seq[Char]], arbol: Trie): Boolean = {
       if (conjInicial.isEmpty) return false
       val tam = conjInicial.head.length
@@ -69,13 +74,16 @@ package object ReconstCadenasPar {
       part.forall(w => pertenece(w, arbol))
     }
 
+    // Genera nuevas combinaciones de cadenas y filtra solo las que cumplen con la validación
     def filtrar(cadenas: Seq[Seq[Char]]): Seq[Seq[Char]] = {
       if (cadenas.isEmpty) return Seq.empty
 
-      val arbol = arbolDeSufijos(cadenas.toList)  // Solo aquí usamos toList porque el árbol lo necesita
+      // Se construye el árbol de sufijos (estructura para validar subsecuencias) → solo funciona con List
+      val arbol = arbolDeSufijos(cadenas.toList)
 
       val longitudActual = cadenas.headOption.map(_.length).getOrElse(0)
 
+      // Si la longitud actual es mayor o igual al umbral → ejecuta secuencialmente (evitar sobrecarga de hilos)
       if (longitudActual >= umbral) {
         for {
           c1 <- cadenas
@@ -84,10 +92,12 @@ package object ReconstCadenasPar {
           if particiones(s, cadenas, arbol)
         } yield s
       } else {
+        // Si la longitud es menor que el umbral → ejecuta en paralelo para acelerar combinaciones
         val cadenasPar = cadenas.par
         val mitad = cadenasPar.size / 2
         val (left, right) = cadenasPar.splitAt(mitad)
 
+        // Se procesan en paralelo dos mitades de las cadenas
         val (res1, res2) = parallel(
           left.flatMap(c1 => cadenas.collect {
             case c2 if particiones(c1 ++ c2, cadenas, arbol) => c1 ++ c2
@@ -97,10 +107,12 @@ package object ReconstCadenasPar {
           })
         )
 
+        // Se unen los resultados paralelos
         (res1 ++ res2).seq
       }
     }
 
+    // Función recursiva que genera, filtra y verifica combinaciones hasta encontrar la cadena deseada
     def recursivaTurboAceleradaPar(alfa: Seq[Seq[Char]]): Seq[Char] = {
       val combinaciones = filtrar(alfa)
 
@@ -108,6 +120,8 @@ package object ReconstCadenasPar {
 
       val longitudActual = combinaciones.headOption.map(_.length).getOrElse(0)
 
+      // Si la longitud actual supera el umbral → filtra secuencialmente
+      // Si no → filtra en paralelo aplicando el oráculo
       val candidatas =
         if (longitudActual >= umbral) {
           combinaciones.filter(o)
@@ -115,12 +129,15 @@ package object ReconstCadenasPar {
           combinaciones.par.filter(o).seq
         }
 
+      // Si encuentra la cadena correcta → la devuelve, si no → continúa recursivamente
       if (candidatas.isEmpty) Seq.empty
       else candidatas.find(_.length == n).getOrElse(recursivaTurboAceleradaPar(candidatas))
     }
 
+    // Se construye el conjunto inicial con las posibles letras (alfabeto)
     val conjuntoInicial = alfabeto.map(Seq(_))
 
+    // Casos base: si la longitud es 1 o 2 → se prueban todas las combinaciones posibles sin recursión
     if (n == 1) {
       conjuntoInicial.find(c => o(c)).getOrElse(Seq.empty)
     } else if (n == 2) {
@@ -132,6 +149,7 @@ package object ReconstCadenasPar {
       } yield s
       combinaciones.headOption.getOrElse(Seq.empty)
     } else {
+      // Para cadenas de longitud mayor → se llama a la función recursiva optimizada
       recursivaTurboAceleradaPar(conjuntoInicial)
     }
   }
