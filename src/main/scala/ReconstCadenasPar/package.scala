@@ -78,56 +78,40 @@ package object ReconstCadenasPar {
     def filtrar(cadenas: Seq[Seq[Char]]): Seq[Seq[Char]] = {
       if (cadenas.isEmpty) return Seq.empty
 
-      // Se construye el árbol de sufijos (estructura para validar subsecuencias) → solo funciona con List
+      // Se construye el árbol de sufijos (estructura para validar subsecuencias)
       val arbol = arbolDeSufijos(cadenas.toList)
 
-      val longitudActual = cadenas.headOption.map(_.length).getOrElse(0)
-
-      // Si la longitud actual es mayor o igual al umbral → ejecuta secuencialmente (evitar sobrecarga de hilos)
-      if (longitudActual >= umbral) {
+      // El umbral se aplica aquí al tamaño del conjunto 'cadenas' (SC)
+      // Paraleliza la generación de combinaciones si el tamaño de 'cadenas' es menor que el umbral
+      if (cadenas.size < umbral) {
+        val combinacionesFiltradasPar = for {
+          c1 <- cadenas.par // Paraleliza la iteración externa
+          c2 <- cadenas
+          s = c1 ++ c2
+          if particiones(s, cadenas, arbol)
+        } yield s
+        combinacionesFiltradasPar.seq // Vuelve a una colección secuencial
+      } else {
+        // Si el tamaño de 'cadenas' es igual o mayor al umbral, ejecuta secuencialmente
         for {
           c1 <- cadenas
           c2 <- cadenas
           s = c1 ++ c2
           if particiones(s, cadenas, arbol)
         } yield s
-      } else {
-        // Si la longitud es menor que el umbral → ejecuta en paralelo para acelerar combinaciones
-        val cadenasPar = cadenas.par
-        val mitad = cadenasPar.size / 2
-        val (left, right) = cadenasPar.splitAt(mitad)
-
-        // Se procesan en paralelo dos mitades de las cadenas
-        val (res1, res2) = parallel(
-          left.flatMap(c1 => cadenas.collect {
-            case c2 if particiones(c1 ++ c2, cadenas, arbol) => c1 ++ c2
-          }),
-          right.flatMap(c1 => cadenas.collect {
-            case c2 if particiones(c1 ++ c2, cadenas, arbol) => c1 ++ c2
-          })
-        )
-
-        // Se unen los resultados paralelos
-        (res1 ++ res2).seq
       }
     }
 
     // Función recursiva que genera, filtra y verifica combinaciones hasta encontrar la cadena deseada
     def recursivaTurboAceleradaPar(alfa: Seq[Seq[Char]]): Seq[Char] = {
-      val combinaciones = filtrar(alfa)
+      val combinaciones = filtrar(alfa) // Esta llamada puede ser paralela o secuencial según el umbral
 
       if (combinaciones.isEmpty) return Seq.empty
 
-      val longitudActual = combinaciones.headOption.map(_.length).getOrElse(0)
-
-      // Si la longitud actual supera el umbral → filtra secuencialmente
-      // Si no → filtra en paralelo aplicando el oráculo
-      val candidatas =
-        if (longitudActual >= umbral) {
-          combinaciones.filter(o)
-        } else {
-          combinaciones.par.filter(o).seq
-        }
+      // *** Esta parte SIEMPRE se paraleliza ***
+      // El filtro con el oráculo es el cuello de botella principal debido al Thread.sleep.
+      // Es crucial paralelizarlo para obtener un buen speedup, independientemente del tamaño de las cadenas.
+      val candidatas = combinaciones.par.filter(o).seq
 
       // Si encuentra la cadena correcta → la devuelve, si no → continúa recursivamente
       if (candidatas.isEmpty) Seq.empty
@@ -137,17 +121,18 @@ package object ReconstCadenasPar {
     // Se construye el conjunto inicial con las posibles letras (alfabeto)
     val conjuntoInicial = alfabeto.map(Seq(_))
 
-    // Casos base: si la longitud es 1 o 2 → se prueban todas las combinaciones posibles sin recursión
+    // Casos base: si la longitud es 1 o 2
     if (n == 1) {
-      conjuntoInicial.find(c => o(c)).getOrElse(Seq.empty)
+      // También se paraleliza la llamada al oráculo en el caso base si es necesario
+      conjuntoInicial.par.find(c => o(c)).getOrElse(Seq.empty)
     } else if (n == 2) {
       val combinaciones = for {
         c1 <- conjuntoInicial
         c2 <- conjuntoInicial
         s = c1 ++ c2
-        if o(s)
       } yield s
-      combinaciones.headOption.getOrElse(Seq.empty)
+      // Paralelizar la comprobación del oráculo también para n=2
+      combinaciones.par.find(o).getOrElse(Seq.empty)
     } else {
       // Para cadenas de longitud mayor → se llama a la función recursiva optimizada
       recursivaTurboAceleradaPar(conjuntoInicial)

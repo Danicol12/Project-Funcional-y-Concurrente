@@ -172,12 +172,12 @@ sec16.length
 val cadenaAleatoria=contruirCadenaAleatoria(128)
 val orac = crearOraculo(1)(cadenaAleatoria)
 
-val pruebaTurboAcelerada= reconstruirCadenaTurboAcelerada(32, orac)
-val pruebaTurboAceleradaPar= reconstruirCadenaTurboAceleradaPar(8)(32, orac)
+val pruebaTurboAcelerada= reconstruirCadenaTurboAcelerada(128, orac)
+val pruebaTurboAceleradaPar= reconstruirCadenaTurboAceleradaPar(2)(128, orac)
 pruebaTurboAcelerada==pruebaTurboAceleradaPar
 
 
-val ((tiempo1, tiempo2, speedup), resultados) = promedioComparacion(reconstruirCadenaTurboAcelerada, reconstruirCadenaTurboAceleradaPar(32))(128, 1, orac)
+val ((tiempo1, tiempo2, speedup), resultados) = promedioComparacion(reconstruirCadenaTurboAcelerada, reconstruirCadenaTurboAceleradaPar(2))(128, 1, orac)
 
 println(f"Tiempo promedio Secuencial: $tiempo1%.4f s")
 println(f"Tiempo promedio Paralelo: $tiempo2%.4f s")

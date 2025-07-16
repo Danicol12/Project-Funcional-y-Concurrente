@@ -2,5 +2,8 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../Attenzio" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../Nueva carpeta" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../db-2024-django-react" vcs="Git" />
   </component>
 </project>
