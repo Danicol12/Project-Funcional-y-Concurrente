@@ -6,7 +6,9 @@ lazy val root = (project in file("."))
   .settings(
     name := "Proyecto_Final_FYC"
   )
+
 scalacOptions ++= Seq("-language:implicitConversions", "-deprecation")
+
 libraryDependencies ++= Seq(
   ("com.storm-enroute" %% "scalameter-core" % "0.21").cross(CrossVersion.for3Use2_13),
   "org.scala-lang.modules" %% "scala-parallel-collections" % "1.0.3",

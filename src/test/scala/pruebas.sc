@@ -1,5 +1,5 @@
 import ReconstCadenas.*
-import ReconstCadenasPar.*
+import ReconstCadenasPar .*
 import Oraculo.*
 import ArbolSufijos.*
 import benchmark.*
@@ -164,22 +164,66 @@ val sec1024 = Seq(
   'a','g','t','t','g','t','a','a','t','c','c','a','a','t','c','c'
 )
 
+
 sec256.length
 sec512.length
 sec1024.length
 sec16.length
 
-val cadenaAleatoria=contruirCadenaAleatoria(7)
+val cadenaAleatoria=contruirCadenaAleatoria(2)
 val orac = crearOraculo(1)(cadenaAleatoria)
-/*
-//val pruebaTurbo= reconstruirCadenaTurbo(128, orac)
-val pruebaTurboMejorada= reconstruirCadenaTurboMejorada(128, orac)
-val pruebaTurboAcelerada= reconstruirCadenaTurboAcelerada(128,orac)
 
-pruebaTurboMejorada==pruebaTurboAcelerada
-pruebaTurboAcelerada==secprueba
+
+val pruebaMejorado= reconstruirCadenaMejorado(2, orac)
+val pruebaMejoradoPar= reconstruirCadenaMejoradoPar(1)(2, orac)
+
+cadenaAleatoria==pruebaMejorado
+
+pruebaMejorado==pruebaMejoradoPar
+promedioComparacion(reconstruirCadenaMejorado, reconstruirCadenaMejoradoPar(1))(4, 5, orac)
+
+val pruebaMejorado= reconstruirCadenaMejorado(4, orac)
+val pruebaMejoradoPar= reconstruirCadenaMejoradoPar(2)(4, orac)
+
+cadenaAleatoria==pruebaMejorado
+
+pruebaMejorado==pruebaMejoradoPar
+promedioComparacion(reconstruirCadenaMejorado, reconstruirCadenaMejoradoPar(4))(16, 5, orac)
+
+val pruebaMejorado= reconstruirCadenaMejorado(8, orac)
+val pruebaMejoradoPar= reconstruirCadenaMejoradoPar(2)(8, orac)
+
+cadenaAleatoria==pruebaMejorado
+
+pruebaMejorado==pruebaMejoradoPar
+promedioComparacion(reconstruirCadenaMejorado, reconstruirCadenaMejoradoPar(4))(16, 5, orac)
+
+val pruebaMejorado= reconstruirCadenaMejorado(16, orac)
+val pruebaMejoradoPar= reconstruirCadenaMejoradoPar(4)(16, orac)
+
+cadenaAleatoria==pruebaMejorado
+
+pruebaMejorado==pruebaMejoradoPar
+promedioComparacion(reconstruirCadenaMejorado, reconstruirCadenaMejoradoPar(4))(16, 5, orac)
+
+
+val cadenaAleatoria=contruirCadenaAleatoria(32)
+val orac = crearOraculo(1)(cadenaAleatoria)
+
+val pruebaMejorado= reconstruirCadenaMejorado(32, orac)
+val pruebaMejoradoPar= reconstruirCadenaMejoradoPar(4)(32, orac)
+
+cadenaAleatoria==pruebaMejorado
+
+pruebaMejorado==pruebaMejoradoPar
+promedioComparacion(reconstruirCadenaMejorado, reconstruirCadenaMejoradoPar(4))(32, 5, orac)
+
+/*println(f"Tiempo promedio Secuencial: $tiempo1%.4f s")
+println(f"Tiempo promedio Paralelo: $tiempo2%.4f s")
+println(f"Speedup promedio: $speedup%.2f")
+
+
+resultados.zipWithIndex.foreach { case ((t1, t2, sp), idx) =>
+  println(f"Repetición ${idx + 1}: Sec = $t1%.4f s, Par = $t2%.4f s, Speedup = $sp%.2f")
+}
 */
-
-promedioComparacion(reconstruirCadenaIngenuo, reconstruirCadenaIngenuoPar(5))(7,5,orac)
-
-//compararAlgoritmos(reconstruirCadenaTurboAcelerada,reconstruirCadenaTurboAceleradaPar(8))(256,orac)

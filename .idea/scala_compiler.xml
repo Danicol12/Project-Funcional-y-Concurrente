@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ScalaCompilerConfiguration">
-    <option name="separateProdTestSources" value="true" />
-    <profile name="sbt 1" modules="Proyecto_Final_FYC" />
-    <profile name="sbt 2" modules="Proyecto_Final_FYC.main,Proyecto_Final_FYC.test">
+    <profile name="sbt 2" modules="Proyecto_Final_FYC,Proyecto_Final_FYC.main,Proyecto_Final_FYC.test">
       <option name="implicitConversions" value="true" />
       <option name="deprecationWarnings" value="true" />
     </profile>
