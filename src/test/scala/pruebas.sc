@@ -5,6 +5,8 @@ import ArbolSufijos.*
 import benchmark.*
 import org.scalameter.measure
 
+import scala.util.Random
+
 val sec = List('g','a')
 val sec4 = Seq('a', 'c', 'g', 't')
 val sec8 = Seq('g', 'a', 't', 'c', 'c', 'a', 'g', 't')
@@ -164,22 +166,118 @@ val sec1024 = Seq(
   'a','g','t','t','g','t','a','a','t','c','c','a','a','t','c','c'
 )
 
+def generarSecuenciaAleatoria(longitud: Int): Seq[Char] = {
+  val random = new Random()
+  Seq.fill(longitud)(alfabeto(random.nextInt(alfabeto.length)))
+}
+
+val sec2048 = generarSecuenciaAleatoria(2048)
+val sec4096 = generarSecuenciaAleatoria(4096)
+
 sec256.length
 sec512.length
 sec1024.length
 sec16.length
 
-val cadenaAleatoria=contruirCadenaAleatoria(7)
-val orac = crearOraculo(1)(cadenaAleatoria)
-/*
-//val pruebaTurbo= reconstruirCadenaTurbo(128, orac)
-val pruebaTurboMejorada= reconstruirCadenaTurboMejorada(128, orac)
-val pruebaTurboAcelerada= reconstruirCadenaTurboAcelerada(128,orac)
+val repeticiones = 5
 
-pruebaTurboMejorada==pruebaTurboAcelerada
-pruebaTurboAcelerada==secprueba
-*/
+val configuracionesDePrueba = List(
+  (2, sec, 1, 10, 20),
+  (4, sec4, 2, 10, 20),
+  (8, sec8, 4, 10, 20),
+  (16, sec16, 8, 10, 15),
+  (32, sec32, 16, 8, 12),
+  (64, sec64, 32, 5, 10),
+  (128, sec128, 64, 3, 5),
+  (256, sec256, 128, 2, 4),
+  (512, sec512, 256, 1, 3),
+  (1024, sec1024, 512, 1, 2),
+)
 
-promedioComparacion(reconstruirCadenaIngenuo, reconstruirCadenaIngenuoPar(5))(7,5,orac)
+configuracionesDePrueba.foreach { case (longitud, secuencia, umbral, minWarmup, maxWarmup) =>
 
-//compararAlgoritmos(reconstruirCadenaTurboAcelerada,reconstruirCadenaTurboAceleradaPar(8))(256,orac)
+  println(s"--- Iniciando Benchmark para Longitud = $longitud (Warmups: $minWarmup/$maxWarmup) ---")
+
+  val oraculo = crearOraculo(1)(secuencia)
+
+  val algoSecuencial: benchmark.Algoritmo = (n, o) =>
+    ReconstCadenas.reconstruirCadenaTurbo(n, o)
+
+  val algoParalelo: benchmark.Algoritmo = (n, o) =>
+    reconstruirCadenaTurboPar(umbral)(n, o)
+
+  println("Ejecutando benchmarks...")
+
+  // AHORA SE PASAN LOS VALORES DE WARMUP A LA FUNCIÓN DE BENCHMARK
+  val ((promedioSec, promedioPar, promedioSpeedup), resultados) =
+    promedioComparacion(algoSecuencial, algoParalelo)(longitud, repeticiones, oraculo, minWarmup, maxWarmup)
+
+  println("\n" + "="*95)
+  println(s"               RESULTADOS PARA EL INFORME: reconstruirCadenaTurbo (n=$longitud)")
+  println("="*95)
+
+  println(f"${"Longitud"}%-10s | ${"Intento"}%-10s | ${"Acelerada (ms)"}%-18s | ${"AceleradaPar (ms)"}%-20s | ${"Speedup"}%-10s | ${"Umbral"}%-8s")
+  println("-" * 95)
+
+  resultados.zipWithIndex.foreach { case ((tiempoSec, tiempoPar, speedup), i) =>
+    println(f"${longitud}%-10d | ${i + 1}%-10d | ${tiempoSec}%-18.4f | ${tiempoPar}%-20.4f | ${speedup}%-10.2f | ${umbral}%-8d")
+  }
+
+  println("-" * 95)
+  println(f"${""}%-10s | ${"Promedio"}%-10s | ${promedioSec}%-18.4f | ${promedioPar}%-20.4f | ${promedioSpeedup}%-10.2f | ${umbral}%-8d")
+  println("="*95 + "\n\n")
+}
+
+println("--- Todos los benchmarks han finalizado. ---")
+
+val configuracionesDePruebaMejorada = List(
+  (2, sec, 1, 10, 20),
+  (4, sec4, 2, 10, 20),
+  (8, sec8, 4, 10, 20),
+  (16, sec16, 8, 10, 15),
+  (32, sec32, 16, 8, 12),
+  (64, sec64, 32, 5, 10),
+  (128, sec128, 64, 3, 5),
+  (256, sec256, 128, 2, 4),
+  (512, sec512, 256, 1, 3),
+  (1024, sec1024, 512, 1, 2),
+  (2048, sec2048, 1024, 1, 1),
+  (4096, sec4096, 2048, 1, 1)
+)
+
+
+configuracionesDePruebaMejorada.foreach { case (longitud, secuencia, umbral, minWarmup, maxWarmup) =>
+
+  println(s"--- Iniciando Benchmark para Longitud = $longitud (Warmups: $minWarmup/$maxWarmup) ---")
+
+  val oraculo = crearOraculo(1)(secuencia)
+
+  val algoSecuencial: benchmark.Algoritmo = (n, o) =>
+    ReconstCadenas.reconstruirCadenaTurboMejorada(n, o)
+
+  val algoParalelo: benchmark.Algoritmo = (n, o) =>
+    reconstruirCadenaTurboMejoradaPar(umbral)(n, o)
+
+  println("Ejecutando benchmarks...")
+
+  // AHORA SE PASAN LOS VALORES DE WARMUP A LA FUNCIÓN DE BENCHMARK
+  val ((promedioSec, promedioPar, promedioSpeedup), resultados) =
+    promedioComparacion(algoSecuencial, algoParalelo)(longitud, repeticiones, oraculo, minWarmup, maxWarmup)
+
+  println("\n" + "="*95)
+  println(s"               RESULTADOS PARA EL INFORME: reconstruirCadenaTurboMejorada (n=$longitud)")
+  println("="*95)
+
+  println(f"${"Longitud"}%-10s | ${"Intento"}%-10s | ${"Acelerada (ms)"}%-18s | ${"AceleradaPar (ms)"}%-20s | ${"Speedup"}%-10s | ${"Umbral"}%-8s")
+  println("-" * 95)
+
+  resultados.zipWithIndex.foreach { case ((tiempoSec, tiempoPar, speedup), i) =>
+    println(f"${longitud}%-10d | ${i + 1}%-10d | ${tiempoSec}%-18.4f | ${tiempoPar}%-20.4f | ${speedup}%-10.2f | ${umbral}%-8d")
+  }
+
+  println("-" * 95)
+  println(f"${""}%-10s | ${"Promedio"}%-10s | ${promedioSec}%-18.4f | ${promedioPar}%-20.4f | ${promedioSpeedup}%-10.2f | ${umbral}%-8d")
+  println("="*95 + "\n\n")
+}
+
+println("--- Todos los benchmarks han finalizado. ---")
