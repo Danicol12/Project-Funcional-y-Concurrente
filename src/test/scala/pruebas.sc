@@ -14,24 +14,32 @@ val sec8 = Seq('g', 'a', 't', 'c', 'c', 'a', 'g', 't')
 
 val cadenaAleatoria=contruirCadenaAleatoria(5)
 val cadenaAleatoria2=contruirCadenaAleatoria(128)
+val cadenaAleatoria3=contruirCadenaAleatoria(64)
+
 
 val orac = crearOraculo(1)(cadenaAleatoria)
 
 val orac2= crearOraculo(1)(cadenaAleatoria2)
 
+val orac3=crearOraculo(1)(cadenaAleatoria3)
+/*
+val prueba0= compararAlgoritmos(reconstruirCadenaTurbo,reconstruirCadenaTurboMejorada)(128,orac3)
 
-
+ */
+/*
 val prueba1=reconstruirCadenaIngenuo(5,orac)
 val prueba2=reconstruirCadenaIngenuoPar(3)(5,orac)
 
 prueba1==prueba2
 promedioComparacion(reconstruirCadenaTurboMejorada,reconstruirCadenaTurboMejoradaPar(3))(5,3,orac)
 
-val prueba3=reconstruirCadenaTurboAcelerada(128,orac)
-val prueba4=reconstruirCadenaTurboAceleradaPar(16)(128,orac)
+ */
+
+val prueba3=reconstruirCadenaTurboAcelerada(64,orac3)
+val prueba4=reconstruirCadenaTurboAceleradaPar(16)(64,orac3)
 
 prueba3==prueba4
-promedioComparacion(reconstruirCadenaTurboMejorada,reconstruirCadenaTurboMejoradaPar(16))(128,2,orac)
+val resultados = promedioComparacion(reconstruirCadenaTurboMejorada,reconstruirCadenaTurboMejoradaPar(16))(64,2,orac3)
 
 
 
